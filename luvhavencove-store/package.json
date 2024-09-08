@@ -1,8 +1,8 @@
 {
   "name": "medusa-starter-default",
   "version": "0.0.1",
-  "description": "A starter for Medusa projects.",
-  "author": "Medusa (https://medusajs.com)",
+  "description": "LuvHavenCove Backend",
+  "author": "Zhu Jian Kenny Su (https://github.com/potato-panda)",
   "license": "MIT",
   "keywords": [
     "sqlite",

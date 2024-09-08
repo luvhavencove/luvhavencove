@@ -2,8 +2,8 @@
   "name": "medusa-next",
   "version": "1.0.3",
   "private": true,
-  "author": "Kasper Fabricius Kristensen <kasper@medusajs.com> & Victor Gerbrands <victor@medusajs.com> (https://www.medusajs.com)",
-  "description": "Next.js Starter to be used with Medusa server",
+  "author": "Zhu Jian Kenny Su (https://github.com/potato-panda)",
+  "description": "LuvHavenCove Storefront",
   "keywords": [
     "medusa-storefront"
   ],
@@ -36,6 +36,7 @@
     "algoliasearch": "^4.20.0",
     "axios": "^1.6.7",
     "lodash": "^4.17.21",
+    "medusa-next": "file:",
     "medusa-react": "^9.0.0",
     "next": "^14.0.0",
     "pg": "^8.11.3",
