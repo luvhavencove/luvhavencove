@@ -1,0 +1,161 @@
+services:
+  nginx:
+    depends_on:
+      backend:
+        condition: service_healthy
+      storefront:
+        condition: service_started
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - webroot:/var/www/_letsencrypt
+    develop:
+      watch:
+        - path: ./nginx/nginx
+          target: /etc/nginx
+          action: sync+restart
+    networks:
+      - nginx
+  backend:
+    depends_on:
+      postgres: 
+        condition: service_healthy
+        required: true
+      redis: 
+        condition: service_healthy
+        required: true
+      meilisearch: 
+        condition: service_healthy
+        required: true
+    build:
+      context: ./luvhavencove-store
+      dockerfile: Dockerfile
+    command: ./run.sh $ENV
+    ports:
+      - "7001:7001"
+      - "9000:9000"
+    env_file:
+      - path: ./luvhavencove-store/.env
+        required: true
+    healthcheck:
+      test: curl --fail http://localhost:9000/health && curl --fail http://localhost:7001/health || exit 1
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
+    environment:
+      - MEILISEARCH_API_KEY=/run/secrets/meilisearch_master_key
+    volumes:
+      - public_data:/data/public
+      - shared_data:/data/shared
+    secrets:
+      - meilisearch_master_key
+    develop:
+      watch:
+        - path: ./luvhavencove-store
+          action: rebuild
+    networks:
+      - nginx
+  storefront:
+    depends_on:
+      backend:
+        condition: service_healthy
+    build:
+      context: ./luvhavencove-store-storefront
+      dockerfile: Dockerfile
+    command: ./run.sh $ENV
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: ./luvhavencove-store-storefront/.env
+        required: true
+    healthcheck:
+      test: curl --fail http://localhost:8000/health || exit 1
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
+    volumes:
+      - public_data:/data/public
+    develop:
+      watch:
+        - path: ./luvhavencove-store-storefront
+          action: rebuild
+    networks:
+      - nginx
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: pg_isready -U postgres -d luvhavencove
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 5s
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=/run/secrets/postgres_pass
+      - POSTGRES_DB=luvhavencove
+    secrets:
+      - postgres_pass
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - nginx
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 5s
+    networks:
+      - nginx
+  meilisearch:
+    image: getmeili/meilisearch
+    ports:
+      - "7700:7700"
+    healthcheck:
+      test: curl --fail http://localhost:7700/health || exit 1
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 5s
+    environment:
+      - MEILISEARCH_MASTER_KEY=/run/secrets/meilisearch_master_key
+    command: >
+      sh -c "
+      meilisearch --master-key=`cat $$MEILISEARCH_MASTER_KEY`
+      "
+    volumes:
+      - public_data:/data/public
+      - shared_data:/data/shared
+    secrets:
+      - meilisearch_master_key
+    networks:
+      - nginx
+volumes:
+  pgdata: 
+  shared_data:
+  public_data:
+  certbot-etc:
+  certbot-var:
+  webroot:
+secrets:
+  meilisearch_master_key: 
+    file: ./docker/secrets/meilisearch_master_key
+  postgres_pass: 
+    file: ./docker/secrets/postgres_pass
+networks:
+  nginx:
+    driver: "bridge"

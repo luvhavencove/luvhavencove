@@ -1,0 +1,10 @@
+services:
+  certbot:
+    image: certbot/certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - webroot:/var/www/_letsencrypt
+      - ./certbot/cloudflare_api_token.ini:~/.secrets/certbot/cloudflare_api_token.ini
+    command: >
+      certonly --webroot $CERTBOT_ARGS -d $DOMAIN -d www.$DOMAIN
