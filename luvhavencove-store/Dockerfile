@@ -1,5 +1,8 @@
 FROM node:lts AS base
 RUN apt-get -y update && apt-get -y install curl jq
+# Use bash for brace expansion
+RUN /bin/bash -c "install -o node -g node -m 755 -d /data/{shared,public}"
+USER node
 WORKDIR /app
 
 # download all deps
@@ -10,16 +13,13 @@ RUN npm ci --verbose
 # copy over src files to dev
 FROM base AS install
 COPY --from=ci /app/node_modules node_modules
-COPY . /app/
 
-FROM install AS build
-RUN chown -R node:node /app && chmod +x /app/run.sh
+FROM install AS postinstall
+COPY --chown=node:node . /app/
 
-RUN mkdir -p /data/shared && chown -R node:node /data/shared
-RUN mkdir -p /data/public && chown -R node:node /data/public
+FROM postinstall AS setup
+RUN chmod +x /app/run.sh
 
-FROM build AS runner
-
-USER node
+FROM setup AS runner
 
 ENTRYPOINT /app/run.sh

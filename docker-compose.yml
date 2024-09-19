@@ -11,9 +11,15 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    healthcheck:
+      test: service nginx status || exit 1
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 10s
     volumes:
-      - certbot-etc:/etc/letsencrypt
-      - certbot-var:/var/lib/letsencrypt
+      - letsencrypt-etc:/etc/letsencrypt
+      - letsencrypt-var:/var/lib/letsencrypt
       - webroot:/var/www/_letsencrypt
     develop:
       watch:
@@ -24,13 +30,13 @@ services:
       - nginx
   backend:
     depends_on:
-      postgres: 
+      postgres:
         condition: service_healthy
         required: true
-      redis: 
+      redis:
         condition: service_healthy
         required: true
-      meilisearch: 
+      meilisearch:
         condition: service_healthy
         required: true
     build:
@@ -43,19 +49,20 @@ services:
     env_file:
       - path: ./luvhavencove-store/.env
         required: true
+    environment:
+      - MEILISEARCH_API_KEY_FILE=/run/secrets/meilisearch_master_key
+    secrets:
+      - meilisearch_master_key
     healthcheck:
-      test: curl --fail http://localhost:9000/health && curl --fail http://localhost:7001/health || exit 1
+      test: >
+        curl --fail http://localhost:9000/health || exit 1
       interval: 30s
       timeout: 30s
       retries: 5
-      start_period: 10s
-    environment:
-      - MEILISEARCH_API_KEY=/run/secrets/meilisearch_master_key
+      start_period: 15s
     volumes:
       - public_data:/data/public
       - shared_data:/data/shared
-    secrets:
-      - meilisearch_master_key
     develop:
       watch:
         - path: ./luvhavencove-store
@@ -75,6 +82,10 @@ services:
     env_file:
       - path: ./luvhavencove-store-storefront/.env
         required: true
+    environment:
+      - NEXT_PUBLIC_STRIPE_KEY=/run/secrets/stripe_public_key
+    secrets:
+      - stripe_public_key
     healthcheck:
       test: curl --fail http://localhost:8000/health || exit 1
       interval: 30s
@@ -101,7 +112,7 @@ services:
       start_period: 5s
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=/run/secrets/postgres_pass
+      - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_pass
       - POSTGRES_DB=luvhavencove
     secrets:
       - postgres_pass
@@ -113,12 +124,17 @@ services:
     image: redis
     ports:
       - "6379:6379"
+    command: redis-server /run/secrets/redis.conf
+    secrets:
+      - redis.conf
     healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      test: redis-cli --raw incr ping
       interval: 10s
       timeout: 30s
       retries: 5
       start_period: 5s
+    volumes:
+      - redisdata:/data
     networks:
       - nginx
   meilisearch:
@@ -133,29 +149,34 @@ services:
       start_period: 5s
     environment:
       - MEILISEARCH_MASTER_KEY=/run/secrets/meilisearch_master_key
+    secrets:
+      - meilisearch_master_key
     command: >
-      sh -c "
-      meilisearch --master-key=`cat $$MEILISEARCH_MASTER_KEY`
-      "
+      /bin/sh -c "meilisearch --master-key=$(cat $$MEILISEARCH_MASTER_KEY)"
     volumes:
       - public_data:/data/public
       - shared_data:/data/shared
-    secrets:
-      - meilisearch_master_key
     networks:
       - nginx
 volumes:
-  pgdata: 
+  pgdata:
+  redisdata:
   shared_data:
   public_data:
-  certbot-etc:
-  certbot-var:
+  letsencrypt-etc:
+  letsencrypt-var:
   webroot:
 secrets:
-  meilisearch_master_key: 
+  meilisearch_master_key:
     file: ./docker/secrets/meilisearch_master_key
-  postgres_pass: 
+  paypal_client_id:
+    file: ./docker/secrets/paypal_client_id
+  postgres_pass:
     file: ./docker/secrets/postgres_pass
+  redis.conf:
+    file: ./docker/secrets/redis.conf
+  stripe_public_key:
+    file: ./docker/secrets/stripe_public_key
 networks:
   nginx:
     driver: "bridge"

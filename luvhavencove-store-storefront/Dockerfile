@@ -1,5 +1,5 @@
 FROM node:lts AS base
-# RUN groupmod -g 1001 node && usermod -u 1001 -g 1001 node
+USER node
 WORKDIR /app
 
 # download all deps
@@ -10,13 +10,13 @@ RUN npm ci --verbose
 # copy over src files to dev
 FROM base AS install
 COPY --from=ci /app/node_modules node_modules
-COPY . /app/
 
-FROM install AS build
-RUN chown -R node:node /app && chmod +x /app/run.sh
+FROM install AS postinstall
+COPY --chown=node:node . /app/
 
-FROM build AS runner
+FROM postinstall AS setup
+RUN chmod +x /app/run.sh
 
-USER node
+FROM setup AS runner
 
 ENTRYPOINT /app/run.sh
