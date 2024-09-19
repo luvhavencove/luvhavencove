@@ -1,4 +1,7 @@
-.git
+.devcontainer
 .env
+.git
+.github
 Dockerfile
+ec2-user-data.sh
 node_modules

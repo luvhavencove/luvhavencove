@@ -1,4 +1,9 @@
-.git
+.cache
 .env
+.git
+.github
+.vscode
+build
+dist
 Dockerfile
 node_modules

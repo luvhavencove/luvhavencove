@@ -1,11 +1,7 @@
 #!/bin/bash
 
-echo "Running run.sh"
-
-# Checking for Meilisearch Public API key
-if [[ -e /data/public/meilisearch_public_key ]]; then
-  echo "meilisearch_public_key exists"
-else
+# Remove existing Meilisearch Public API key
+if [[ -f /data/public/meilisearch_public_key ]]; then
   rm /data/public/meilisearch_public_key
 fi
 
@@ -26,6 +22,8 @@ else
   echo "Running Backend in 'development'."
   # Run Medusa Migrations
   npx medusa migrations run
+
+  npx medusa user --id 1 --email admin@luvhavencove.com --invite || true
 
   npm run dev && npm run dev:admin
 fi

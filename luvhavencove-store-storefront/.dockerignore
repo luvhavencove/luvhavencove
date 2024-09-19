@@ -1,4 +1,7 @@
-.git
 .env
+.git
+.github
+.next
 Dockerfile
+e2e
 node_modules

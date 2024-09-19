@@ -1,12 +1,11 @@
 FROM node:lts AS base
-RUN apt-get -y update && apt-get -y install curl && apt-get -y install jq
-RUN groupmod -g 1001 node && usermod -u 1001 -g 1001 node
+RUN apt-get -y update && apt-get -y install curl jq
 WORKDIR /app
 
 # download all deps
 FROM base AS ci
 COPY package.json package-lock.json /app/
-RUN npm ci
+RUN npm ci --verbose
 
 # copy over src files to dev
 FROM base AS install
@@ -14,10 +13,13 @@ COPY --from=ci /app/node_modules node_modules
 COPY . /app/
 
 FROM install AS build
-RUN chown 1001:1001 /app && chmod +x /app/run.sh
+RUN chown -R node:node /app && chmod +x /app/run.sh
 
-RUN mkdir -p /data/shared && chown -R 1001:1001 /data/shared
-RUN mkdir -p /data/public && chown -R 1001:1001 /data/public
-# USER node
+RUN mkdir -p /data/shared && chown -R node:node /data/shared
+RUN mkdir -p /data/public && chown -R node:node /data/public
+
+FROM build AS runner
+
+USER node
 
 ENTRYPOINT /app/run.sh

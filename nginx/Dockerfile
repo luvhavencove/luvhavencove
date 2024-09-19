@@ -6,7 +6,7 @@ RUN mkdir -p /var/www/_letsencrypt
 FROM base AS build
 COPY ./nginx /etc/nginx/
 COPY run.sh /
-RUN chown nginx /run.sh && chmod +x /run.sh
+RUN chown nginx:nginx /run.sh && chmod +x /run.sh
 
 FROM build AS runner
 
