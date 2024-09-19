@@ -1,7 +1,5 @@
 .env
 
-cloudflare_api_token.ini
-
 docker/secrets/*
 !docker/secrets/*.template
 
