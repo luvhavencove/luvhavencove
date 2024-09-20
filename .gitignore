@@ -5,6 +5,9 @@
 
 secrets/*
 !secrets/*.template
+!secrets/production/
+secrets/production/*
+!secrets/production/*.template
 
 *.pem
 *.crt

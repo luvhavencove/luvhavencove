@@ -49,11 +49,19 @@ services:
       - "9000:9000"
     env_file:
       - path: ./luvhavencove-store/.env
-        required: true
+        required: false
+      - path: ./luvhavencove-store/.env.production
+        required: false
     environment:
       - MEILISEARCH_API_KEY_FILE=/run/secrets/meilisearch_master_key
+      - PAYPAL_CLIENT_ID=/run/secrets/paypal_client_id
+      - PAYPAL_CLIENT_SECRET=/run/secrets/paypal_client_secret
+      - PAYPAL_AUTH_WEBHOOK_ID=/run/secrets/paypal_auth_webhook_id
     secrets:
       - meilisearch_master_key
+      - paypal_client_id
+      - paypal_client_secret
+      - paypal_auth_webhook_id
     healthcheck:
       test: >
         curl --fail http://localhost:9000/health || exit 1
@@ -82,11 +90,13 @@ services:
       - "8000:8000"
     env_file:
       - path: ./luvhavencove-store-storefront/.env
-        required: true
+        required: false
+      - path: ./luvhavencove-store-storefront/.env.production
+        required: false
     environment:
-      - NEXT_PUBLIC_STRIPE_KEY=/run/secrets/stripe_public_key
+      - PAYPAL_CLIENT_ID=/run/secrets/paypal_client_id
     secrets:
-      - stripe_public_key
+      - paypal_client_id
     healthcheck:
       test: curl --fail http://localhost:8000/health || exit 1
       interval: 30s
@@ -171,21 +181,19 @@ volumes:
   webroot:
 secrets:
   cloudflare_api_token:
-    file: ./docker/secrets/cloudflare_api_token.ini
+    file: ./secrets/cloudflare_api_token.ini
   meilisearch_master_key:
-    file: ./docker/secrets/meilisearch_master_key
+    file: ./secrets/meilisearch_master_key
   paypal_client_id:
-    file: ./docker/secrets/paypal_client_id
+    file: ./secrets/paypal_client_id
   paypal_client_secret:
-    file: ./docker/secrets/paypal_client_secret
+    file: ./secrets/paypal_client_secret
   paypal_auth_webhook_id:
-    file: ./docker/secrets/paypal_auth_webhook_id
+    file: ./secrets/paypal_auth_webhook_id
   postgres_pass:
-    file: ./docker/secrets/postgres_pass
+    file: ./secrets/postgres_pass
   redis.conf:
-    file: ./docker/secrets/redis.conf
-  stripe_public_key:
-    file: ./docker/secrets/stripe_public_key
+    file: ./secrets/redis.conf
 networks:
   nginx:
     driver: "bridge"

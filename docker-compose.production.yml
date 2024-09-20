@@ -39,9 +39,11 @@ secrets:
     file: ./secrets/production/meilisearch_master_key
   paypal_client_id:
     file: ./secrets/production/paypal_client_id
+  paypal_client_secret:
+    file: ./secrets/production/paypal_client_secret
+  paypal_auth_webhook_id:
+    file: ./secrets/production/paypal_auth_webhook_id
   postgres_pass:
     file: ./secrets/production/postgres_pass
   redis.conf:
     file: ./secrets/production/redis.conf
-  stripe_public_key:
-    file: ./secrets/production/stripe_public_key
