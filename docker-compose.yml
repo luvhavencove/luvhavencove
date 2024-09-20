@@ -176,6 +176,10 @@ secrets:
     file: ./docker/secrets/meilisearch_master_key
   paypal_client_id:
     file: ./docker/secrets/paypal_client_id
+  paypal_client_secret:
+    file: ./docker/secrets/paypal_client_secret
+  paypal_auth_webhook_id:
+    file: ./docker/secrets/paypal_auth_webhook_id
   postgres_pass:
     file: ./docker/secrets/postgres_pass
   redis.conf:
