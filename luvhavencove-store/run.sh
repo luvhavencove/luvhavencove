@@ -17,7 +17,7 @@ curl -X GET "$MEILISEARCH_HOST/keys" \
   sed 's/"//g' > /data/public/meilisearch_public_key
 
 # Run Medusa Seeding
-npx medusa seed -f ./data/seed.json || true
+# npx medusa seed -f ./data/seed.json || true
 
 if [[ "$1" == "production" ]]; then
   echo "Running Backend in 'production'."
@@ -27,7 +27,7 @@ else
   # Run Medusa Migrations
   npx medusa migrations run
 
-  npx medusa user --id 1 --email admin@luvhavencove.com --invite || true
+  npx medusa user --id 1 --email $ADMIN_EMAIL --password $ADMIN_PASSWORD || true
 
   npm run dev && npm run dev:admin
 fi

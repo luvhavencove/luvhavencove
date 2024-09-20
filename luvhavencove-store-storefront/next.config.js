@@ -5,6 +5,16 @@ const store = require("./store.config.json")
  * @type {import('next').NextConfig}
  */
 const nextConfig = withStoreConfig({
+  // resolves the '`x-forwarded-host` header with value `localhost` does not match `origin` header with value `localhost:8080` from a forwarded Server Actions request' problem that is happening
+  experimental: {
+    serverActions: {
+      allowedOrigins: [
+        "localhost:8080",
+        "luvhavencove.com",
+        "www.luvhavencove.com"
+      ],
+    }
+  },
   features: store.features,
   reactStrictMode: true,
   images: {

@@ -1,7 +1,10 @@
 .env
+.env.*
+!.env.template
+!.env.*.template
 
-docker/secrets/*
-!docker/secrets/*.template
+secrets/*
+!secrets/*.template
 
 *.pem
 *.crt
