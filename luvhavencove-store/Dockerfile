@@ -1,25 +1,37 @@
 FROM node:lts AS base
-RUN apt-get -y update && apt-get -y install curl jq
+RUN rm /bin/sh && ln -s /bin/bash /bin/sh
 # Use bash for brace expansion
-RUN /bin/bash -c "install -o node -g node -m 755 -d /data/{shared,public}"
+RUN install -o node -g node -m 755 -d /data/{shared,public}
 USER node
 WORKDIR /app
 
-# download all deps
 FROM base AS ci
 COPY package.json package-lock.json /app/
 RUN npm ci --verbose
 
-# copy over src files to dev
-FROM base AS install
-COPY --from=ci /app/node_modules node_modules
+FROM base AS ci-development
+COPY package.json package-lock.json /app/
+RUN npm ci --verbose
 
-FROM install AS postinstall
+FROM base AS build
+COPY --from=ci-development /app/node_modules node_modules
 COPY --chown=node:node . /app/
+RUN npm run build
 
-FROM postinstall AS setup
+FROM base AS postbuild
+COPY --from=ci /app/node_modules node_modules
+COPY --chown=node:node . /app/
+RUN find . -type f -name "*.template" | sed "s#.template##" | xargs -I % bash -c "cp -a %.template %"
 RUN chmod +x /app/run.sh
 
-FROM setup AS runner
+FROM postbuild AS production
 
 ENTRYPOINT /app/run.sh
+
+FROM base AS setup-dev
+COPY --from=ci-development /app/node_modules node_modules
+COPY --chown=node:node . /app/
+
+FROM setup-dev AS development
+
+ENTRYPOINT [ "/app/run.sh" ]

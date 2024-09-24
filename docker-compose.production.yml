@@ -32,17 +32,25 @@ services:
       - PROXIED=true
     secrets:
       - cloudflare_api_token
+    backend:
+      env_file:
+        - path: ./luvhavencove-store/.env.production
+          required: false
+      environment:
+        - NODE_ENV=production
+    storefront:
+      env_file:
+        - path: ./luvhavencove-store-storefront/.env.production
+          required: false
+      environment:
+        - NODE_ENV=production
 secrets:
   cloudflare_api_token:
     file: ./secrets/production/cloudflare_api_token.ini
   meilisearch_master_key:
     file: ./secrets/production/meilisearch_master_key
-  paypal_client_id:
-    file: ./secrets/production/paypal_client_id
   paypal_client_secret:
     file: ./secrets/production/paypal_client_secret
-  paypal_auth_webhook_id:
-    file: ./secrets/production/paypal_auth_webhook_id
   postgres_pass:
     file: ./secrets/production/postgres_pass
   redis.conf:

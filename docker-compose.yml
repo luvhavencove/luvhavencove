@@ -37,31 +37,29 @@ services:
       redis:
         condition: service_healthy
         required: true
+      meilisearch-init:
+        condition: service_completed_successfully
+        required: false
       meilisearch:
         condition: service_healthy
         required: true
     build:
       context: ./luvhavencove-store
       dockerfile: Dockerfile
-    command: ./run.sh $ENV
+    command: ./run.sh
     ports:
       - "7001:7001"
       - "9000:9000"
     env_file:
       - path: ./luvhavencove-store/.env
         required: false
-      - path: ./luvhavencove-store/.env.production
-        required: false
     environment:
-      - MEILISEARCH_API_KEY_FILE=/run/secrets/meilisearch_master_key
-      - PAYPAL_CLIENT_ID=/run/secrets/paypal_client_id
+      - NODE_ENV=development
+      - MEILISEARCH_API_KEY=/run/secrets/meilisearch_master_key
       - PAYPAL_CLIENT_SECRET=/run/secrets/paypal_client_secret
-      - PAYPAL_AUTH_WEBHOOK_ID=/run/secrets/paypal_auth_webhook_id
     secrets:
       - meilisearch_master_key
-      - paypal_client_id
       - paypal_client_secret
-      - paypal_auth_webhook_id
     healthcheck:
       test: >
         curl --fail http://localhost:9000/health || exit 1
@@ -85,18 +83,14 @@ services:
     build:
       context: ./luvhavencove-store-storefront
       dockerfile: Dockerfile
-    command: ./run.sh $ENV
+    command: ./run.sh
     ports:
       - "8000:8000"
     env_file:
       - path: ./luvhavencove-store-storefront/.env
         required: false
-      - path: ./luvhavencove-store-storefront/.env.production
-        required: false
     environment:
-      - PAYPAL_CLIENT_ID=/run/secrets/paypal_client_id
-    secrets:
-      - paypal_client_id
+      - NODE_ENV=development
     healthcheck:
       test: curl --fail http://localhost:8000/health || exit 1
       interval: 30s
@@ -116,15 +110,15 @@ services:
     ports:
       - "5432:5432"
     healthcheck:
-      test: pg_isready -U postgres -d luvhavencove
+      test: pg_isready -U $POSTGRES_USER -d $POSTGRES_DB
       interval: 30s
       timeout: 30s
       retries: 5
       start_period: 5s
     environment:
-      - POSTGRES_USER=postgres
+      - POSTGRES_USER=$POSTGRES_USER
       - POSTGRES_PASSWORD_FILE=/run/secrets/postgres_pass
-      - POSTGRES_DB=luvhavencove
+      - POSTGRES_DB=$POSTGRES_DB
     secrets:
       - postgres_pass
     volumes:
@@ -169,7 +163,20 @@ services:
       - shared_data:/data/shared
     networks:
       - nginx
-  
+  meilisearch-init:
+    depends_on:
+      - meilisearch
+    build:
+      context: ./meilisearch-init
+      dockerfile: Dockerfile
+    environment:
+      - MEILISEARCH_HOST=http://meilisearch:7700
+      - MEILISEARCH_API_KEY=/run/secrets/meilisearch_master_key
+    secrets:
+      - meilisearch_master_key
+    volumes:
+      - public_data:/data/public
+      - shared_data:/data/shared
 volumes:
   nginx:
   pgdata:
@@ -184,12 +191,8 @@ secrets:
     file: ./secrets/cloudflare_api_token.ini
   meilisearch_master_key:
     file: ./secrets/meilisearch_master_key
-  paypal_client_id:
-    file: ./secrets/paypal_client_id
   paypal_client_secret:
     file: ./secrets/paypal_client_secret
-  paypal_auth_webhook_id:
-    file: ./secrets/paypal_auth_webhook_id
   postgres_pass:
     file: ./secrets/postgres_pass
   redis.conf:
