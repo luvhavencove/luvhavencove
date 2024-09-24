@@ -7,7 +7,7 @@ RUN install -o runner -g runner -m 755 -d /data/{shared,public}
 
 FROM base AS copy
 COPY . .
-RUN chown runner /app
+RUN chown -R runner:runner /app
 RUN chmod -R +x /app/run.sh
 
 FROM copy AS runner
