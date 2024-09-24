@@ -32,18 +32,18 @@ services:
       - PROXIED=true
     secrets:
       - cloudflare_api_token
-    backend:
-      env_file:
-        - path: ./luvhavencove-store/.env.production
-          required: false
-      environment:
-        - NODE_ENV=production
-    storefront:
-      env_file:
-        - path: ./luvhavencove-store-storefront/.env.production
-          required: false
-      environment:
-        - NODE_ENV=production
+  backend:
+    env_file:
+      - path: ./luvhavencove-store/.env.production
+        required: false
+    environment:
+      - NODE_ENV=production
+  storefront:
+    env_file:
+      - path: ./luvhavencove-store-storefront/.env.production
+        required: false
+    environment:
+      - NODE_ENV=production
 secrets:
   cloudflare_api_token:
     file: ./secrets/production/cloudflare_api_token.ini
