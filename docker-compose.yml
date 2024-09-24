@@ -177,6 +177,8 @@ services:
     volumes:
       - public_data:/data/public
       - shared_data:/data/shared
+    networks:
+      - nginx
 volumes:
   nginx:
   pgdata:
