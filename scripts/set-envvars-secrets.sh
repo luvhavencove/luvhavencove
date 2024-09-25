@@ -19,7 +19,7 @@ if [[ -f "$project_root/.env" ]]; then
   echo "Setting environment variables and secrets from .env"
   for template in ${templates}; do
     target=$(echo ${template} | sed 's#.template##')
-    envsubst < ${template} >target
+    envsubst < ${template} >$target
     echo "Set $target"
   done
   echo "Finishing setting environment variables and secrets from .env"

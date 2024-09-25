@@ -1,4 +1,7 @@
 services:
+  nginx:
+    environment:
+      - ENV=$ENV
   certbot:
     depends_on:
       - nginx
@@ -6,12 +9,12 @@ services:
       context: ./certbot
       dockerfile: Dockerfile
     environment:
+      - CLOUDFLARE_EMAIL=$CLOUDFLARE_EMAIL
       - DOMAIN=$DOMAIN
     volumes:
       - letsencrypt-etc:/etc/letsencrypt
       - letsencrypt-var:/var/lib/letsencrypt
       - webroot:/var/www/_letsencrypt
-      - nginx:/etc/nginx
     secrets:
       - cloudflare_api_token.ini
   cloudflare-ddns:

@@ -23,6 +23,7 @@ if [[ -e $DEFAULT_CONF_FILE ]]; then
 fi
 
 # Enable site
+mkdir $NGINX_DIR/sites-enabled || true
 ln -sf $NGINX_DIR/sites-available/$CONF_FILE \
      $NGINX_DIR/sites-enabled/$CONF_FILE
 
@@ -30,7 +31,7 @@ if [[ ! "$ENV" == "production" ]]; then
      echo "Not in production."
 else
      CERT_DIR="/etc/letsencrypt/live/luvhavencove.com"
-     CERT_FILES=("chain.pem" "fullchain.pem" "privkey.pem")
+     CERT_FILES=("fullchain.pem" "privkey.pem")
 
      echo "Obtaining certifications..."
      # wait until Certbot obtains certs

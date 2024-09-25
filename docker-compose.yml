@@ -21,7 +21,6 @@ services:
       - letsencrypt-etc:/etc/letsencrypt
       - letsencrypt-var:/var/lib/letsencrypt
       - webroot:/var/www/_letsencrypt
-      - nginx:/etc/nginx
     develop:
       watch:
         - path: ./nginx/nginx
@@ -183,7 +182,6 @@ services:
     networks:
       - nginx
 volumes:
-  nginx:
   pgdata:
   redisdata:
   shared_data:
