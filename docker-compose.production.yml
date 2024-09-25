@@ -5,15 +5,15 @@ services:
     build:
       context: ./certbot
       dockerfile: Dockerfile
+    environment:
+      - DOMAIN=$DOMAIN
     volumes:
       - letsencrypt-etc:/etc/letsencrypt
       - letsencrypt-var:/var/lib/letsencrypt
       - webroot:/var/www/_letsencrypt
       - nginx:/etc/nginx
-    command: >
-      certonly -a dns-cloudflare -i nginx --dns-cloudflare-credentials /run/secrets/cloudflare_api_token -d $DOMAIN -d www.$DOMAIN -d api.$DOMAIN -d admin.$DOMAIN
     secrets:
-      - cloudflare_api_token
+      - cloudflare_api_token.ini
   cloudflare-ddns:
     depends_on:
       nginx:
@@ -27,12 +27,15 @@ services:
     security_opt:
       - no-new-privileges=true
     environment:
-      - CF_API_TOKEN=/run/secrets/cloudflare_api_token
+      - CF_API_TOKEN=$CLOUDFLARE_API_TOKEN
       - DOMAINS=$DOMAIN,www.$DOMAIN,api.$DOMAIN,admin.$DOMAIN
       - PROXIED=true
+      - IP6_PROVIDER=none
     secrets:
-      - cloudflare_api_token
+      - cloudflare_api_token.ini
   backend:
+    build:
+      target: production
     env_file:
       - path: ./luvhavencove-store/.env.production
         required: false
@@ -45,7 +48,7 @@ services:
     environment:
       - NODE_ENV=production
 secrets:
-  cloudflare_api_token:
+  cloudflare_api_token.ini:
     file: ./secrets/production/cloudflare_api_token.ini
   meilisearch_master_key:
     file: ./secrets/production/meilisearch_master_key

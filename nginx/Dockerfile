@@ -10,4 +10,4 @@ RUN chown nginx:nginx /run.sh && chmod +x /run.sh
 
 FROM build AS runner
 
-CMD /run.sh
+CMD [ "/run.sh" ]

@@ -1,5 +1,6 @@
 FROM node:lts AS base
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+RUN apt update && apt install bash curl jq
+SHELL [ "bash", "-c" ]
 # Use bash for brace expansion
 RUN install -o node -g node -m 755 -d /data/{shared,public}
 USER node
@@ -26,7 +27,7 @@ RUN chmod +x /app/run.sh
 
 FROM postbuild AS production
 
-ENTRYPOINT /app/run.sh
+ENTRYPOINT [ "/app/run.sh" ]
 
 FROM base AS setup-dev
 COPY --from=ci-development /app/node_modules node_modules

@@ -1,7 +1,5 @@
 FROM node:lts AS base
-ARG NODE_ENV
-ENV NODE_ENV ${NODE_ENV}
-RUN rm /bin/sh && ln -s /bin/bash /bin/sh
+SHELL [ "bash", "-c" ]
 
 USER node
 WORKDIR /app

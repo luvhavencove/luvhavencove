@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load environment variables
-MEILISEARCH_API_KEY=$(cat $MEILISEARCH_API_KEY_FILE)
+MEILISEARCH_API_KEY=$(cat $MEILISEARCH_API_KEY)
 export MEILISEARCH_API_KEY
 
 # Run Medusa Seeding
@@ -9,6 +9,7 @@ export MEILISEARCH_API_KEY
 
 if [[ "$NODE_ENV" == "production" ]]; then
   echo "Running Backend in 'production'."
+  npx medusa migrations run
   npx medusa start
 else
   echo "Running Backend in 'development'."

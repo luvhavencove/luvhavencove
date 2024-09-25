@@ -5,7 +5,7 @@
 NEXT_PUBLIC_SEARCH_API_KEY=$(cat /data/public/meilisearch_public_key)
 export NEXT_PUBLIC_SEARCH_API_KEY
 
-if [[ "$1" == "production" ]]; then
+if [[ "$NODE_ENV" == "production" ]]; then
   echo "Running Storefront in 'production'."
   npm run build
   npm run start

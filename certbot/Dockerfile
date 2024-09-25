@@ -17,6 +17,11 @@ RUN ln -s /opt/certbot/bin/certbot /usr/bin/certbot
 
 RUN /opt/certbot/bin/pip install certbot-dns-cloudflare
 
-FROM build AS runner
+FROM build AS postbuild
+WORKDIR /app
+COPY run.sh /app
+RUN chmod 500 /app/run.sh
 
-ENTRYPOINT certbot
+FROM postbuild AS runner
+
+CMD [ "bash", "-c", "/app/run.sh" ]

@@ -12,4 +12,4 @@ RUN chmod -R +x /app/run.sh
 
 FROM copy AS runner
 
-CMD /app/run.sh
+CMD [ "/app/run.sh" ]

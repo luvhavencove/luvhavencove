@@ -46,6 +46,7 @@ services:
     build:
       context: ./luvhavencove-store
       dockerfile: Dockerfile
+      target: development
     command: ./run.sh
     ports:
       - "7001:7001"
@@ -165,7 +166,9 @@ services:
       - nginx
   meilisearch-init:
     depends_on:
-      - meilisearch
+      meilisearch:
+        condition: service_healthy
+        required: true
     build:
       context: ./meilisearch-init
       dockerfile: Dockerfile
@@ -189,7 +192,7 @@ volumes:
   letsencrypt-var:
   webroot:
 secrets:
-  cloudflare_api_token:
+  cloudflare_api_token.ini:
     file: ./secrets/cloudflare_api_token.ini
   meilisearch_master_key:
     file: ./secrets/meilisearch_master_key
