@@ -1,33 +1,4 @@
 services:
-  nginx:
-    depends_on:
-      backend:
-        condition: service_healthy
-      storefront:
-        condition: service_started
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    ports:
-      - "${HTTP_PORT:-80}:80"
-      - "${HTTPS_PORT:-443}:443"
-    healthcheck:
-      test: service nginx status || exit 1
-      interval: 30s
-      timeout: 30s
-      retries: 5
-      start_period: 10s
-    volumes:
-      - letsencrypt-etc:/etc/letsencrypt
-      - letsencrypt-var:/var/lib/letsencrypt
-      - webroot:/var/www/_letsencrypt
-    develop:
-      watch:
-        - path: ./nginx/nginx
-          target: /etc/nginx
-          action: sync+restart
-    networks:
-      - nginx
   backend:
     depends_on:
       postgres:
@@ -75,7 +46,7 @@ services:
         - path: ./luvhavencove-store
           action: rebuild
     networks:
-      - nginx
+      - luvhavencove_network
   storefront:
     depends_on:
       backend:
@@ -104,7 +75,7 @@ services:
         - path: ./luvhavencove-store-storefront
           action: rebuild
     networks:
-      - nginx
+      - luvhavencove_network
   postgres:
     image: postgres
     ports:
@@ -124,7 +95,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
-      - nginx
+      - luvhavencove_network
   redis:
     image: redis
     ports:
@@ -141,7 +112,7 @@ services:
     volumes:
       - redisdata:/data
     networks:
-      - nginx
+      - luvhavencove_network
   meilisearch:
     image: getmeili/meilisearch
     ports:
@@ -162,7 +133,7 @@ services:
       - public_data:/data/public
       - shared_data:/data/shared
     networks:
-      - nginx
+      - luvhavencove_network
   meilisearch-init:
     depends_on:
       meilisearch:
@@ -180,7 +151,7 @@ services:
       - public_data:/data/public
       - shared_data:/data/shared
     networks:
-      - nginx
+      - luvhavencove_network
 volumes:
   pgdata:
   redisdata:
@@ -190,8 +161,6 @@ volumes:
   letsencrypt-var:
   webroot:
 secrets:
-  cloudflare_api_token.ini:
-    file: ./secrets/cloudflare_api_token.ini
   meilisearch_master_key:
     file: ./secrets/meilisearch_master_key
   paypal_client_secret:
@@ -201,5 +170,5 @@ secrets:
   redis.conf:
     file: ./secrets/redis.conf
 networks:
-  nginx:
+  luvhavencove_network:
     driver: "bridge"

@@ -6,6 +6,12 @@ if [[ -f /data/public/meilisearch_public_key ]]; then
   rm /data/public/meilisearch_public_key
 fi
 
+if [[ ! -f $MEILISEARCH_API_KEY ]]; then
+  echo "No Meilisearch API Key file"
+else 
+  echo "Discovered Meilisearch API Key file"
+fi
+
 # Obtain new Meilisearch Public API key
 curl -X GET "$MEILISEARCH_HOST/keys" \
   -H "Authorization: Bearer $(cat $MEILISEARCH_API_KEY)" \

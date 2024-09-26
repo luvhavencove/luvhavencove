@@ -1,41 +1,4 @@
 services:
-  nginx:
-    environment:
-      - ENV=$ENV
-  certbot:
-    depends_on:
-      - nginx
-    build:
-      context: ./certbot
-      dockerfile: Dockerfile
-    environment:
-      - CLOUDFLARE_EMAIL=$CLOUDFLARE_EMAIL
-      - DOMAIN=$DOMAIN
-    volumes:
-      - letsencrypt-etc:/etc/letsencrypt
-      - letsencrypt-var:/var/lib/letsencrypt
-      - webroot:/var/www/_letsencrypt
-    secrets:
-      - cloudflare_api_token.ini
-  cloudflare-ddns:
-    depends_on:
-      nginx:
-        condition: service_healthy
-    image: favonia/cloudflare-ddns:latest
-    network_mode: host
-    restart: always
-    read_only: true
-    cap_drop:
-      - all
-    security_opt:
-      - no-new-privileges=true
-    environment:
-      - CF_API_TOKEN=$CLOUDFLARE_API_TOKEN
-      - DOMAINS=$DOMAIN,www.$DOMAIN,api.$DOMAIN,admin.$DOMAIN
-      - PROXIED=true
-      - IP6_PROVIDER=none
-    secrets:
-      - cloudflare_api_token.ini
   backend:
     build:
       target: production
@@ -51,8 +14,6 @@ services:
     environment:
       - NODE_ENV=production
 secrets:
-  cloudflare_api_token.ini:
-    file: ./secrets/production/cloudflare_api_token.ini
   meilisearch_master_key:
     file: ./secrets/production/meilisearch_master_key
   paypal_client_secret:
