@@ -15,7 +15,7 @@ services:
       - NODE_ENV=production
   postgres:
     volumes:
-      - ./.data/production:/var/lib/postgresql/data
+      - ./.production/data:/var/lib/postgresql/data
 secrets:
   meilisearch_master_key:
     file: ./secrets/production/meilisearch_master_key

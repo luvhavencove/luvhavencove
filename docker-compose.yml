@@ -93,7 +93,7 @@ services:
     secrets:
       - postgres_pass
     volumes:
-      - ./.data/development:/var/lib/postgresql/data
+      - ./.development/.data:/var/lib/postgresql/data
     networks:
       - luvhavencove_network
   redis:
@@ -157,9 +157,6 @@ volumes:
   redisdata:
   shared_data:
   public_data:
-  letsencrypt-etc:
-  letsencrypt-var:
-  webroot:
 secrets:
   meilisearch_master_key:
     file: ./secrets/meilisearch_master_key

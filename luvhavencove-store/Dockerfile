@@ -32,6 +32,7 @@ ENTRYPOINT [ "/app/run.sh" ]
 FROM base AS setup-dev
 COPY --from=ci-development /app/node_modules node_modules
 COPY --chown=node:node . /app/
+RUN chmod +x /app/run.sh
 
 FROM setup-dev AS development
 
