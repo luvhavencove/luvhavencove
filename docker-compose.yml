@@ -41,10 +41,6 @@ services:
     volumes:
       - public_data:/data/public
       - shared_data:/data/shared
-    develop:
-      watch:
-        - path: ./luvhavencove-store
-          action: rebuild
     networks:
       - luvhavencove_network
   storefront:
@@ -72,8 +68,9 @@ services:
       - public_data:/data/public
     develop:
       watch:
-        - path: ./luvhavencove-store-storefront
-          action: rebuild
+        - action: sync
+          path: ./luvhavencove-store-storefront/src
+          target: /app/src
     networks:
       - luvhavencove_network
   postgres:
