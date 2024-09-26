@@ -93,7 +93,7 @@ services:
     secrets:
       - postgres_pass
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - ./.data/development:/var/lib/postgresql/data
     networks:
       - luvhavencove_network
   redis:
