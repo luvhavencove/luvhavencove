@@ -10,7 +10,8 @@ export MEILISEARCH_API_KEY
 if [[ "$NODE_ENV" == "production" ]]; then
   echo "Running Backend in 'production'."
   npx medusa migrations run
-  npx medusa start
+
+  npm run start
 else
   echo "Running Backend in 'development'."
   # Run Medusa Migrations
