@@ -8,7 +8,7 @@ const ProductDetailNextjs = ({ onNext, isComplete, data }: StepContentProps) => 
     <div>
       <div className="flex flex-col gap-2">
         <Text>
-          We have now created a few sample products in your LuvHavenCove. You can scroll down to see what the Product Detail view looks like in the Admin dashboard.
+          We have now created a few sample products in your Medusa Store. You can scroll down to see what the Product Detail view looks like in the Admin dashboard.
           This is also the view you use to edit existing products.
         </Text>
         <Text>
@@ -34,7 +34,7 @@ const ProductDetailNextjs = ({ onNext, isComplete, data }: StepContentProps) => 
       </div>
       <div className="flex gap-2 mt-6">
         <a
-          href={`http://localhost:8000/products/${product?.handle}?onboarding=true`}
+          href={`${process.env.MEDUSA_ADMIN_STOREFRONT_URL || 'http://localhost:8000'}/products/${product?.handle}?onboarding=true`}
           target="_blank"
         >
           <Button variant="primary" size="base" isLoading={productIsLoading}>
