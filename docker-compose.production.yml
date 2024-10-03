@@ -7,6 +7,8 @@ services:
         required: false
     environment:
       - NODE_ENV=production
+    volumes:
+      - ./.production/uploads:/app/uploads
   storefront:
     env_file:
       - path: ./luvhavencove-store-storefront/.env.production
@@ -15,7 +17,7 @@ services:
       - NODE_ENV=production
   postgres:
     volumes:
-      - ./.production/data:/var/lib/postgresql/data
+      - ./.production/.data:/var/lib/postgresql/data
 secrets:
   meilisearch_master_key:
     file: ./secrets/production/meilisearch_master_key

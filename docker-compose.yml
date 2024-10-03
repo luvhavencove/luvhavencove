@@ -41,6 +41,7 @@ services:
     volumes:
       - public_data:/data/public
       - shared_data:/data/shared
+      - ./.development/uploads:/app/uploads
     networks:
       - luvhavencove_network
   storefront:
@@ -150,7 +151,6 @@ services:
     networks:
       - luvhavencove_network
 volumes:
-  pgdata:
   redisdata:
   shared_data:
   public_data:
