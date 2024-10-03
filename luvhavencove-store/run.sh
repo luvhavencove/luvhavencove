@@ -3,6 +3,8 @@
 # Load environment variables
 MEILISEARCH_API_KEY=$(cat $MEILISEARCH_API_KEY)
 export MEILISEARCH_API_KEY
+PAYPAL_CLIENT_SECRET=$(cat $PAYPAL_CLIENT_SECRET)
+export PAYPAL_CLIENT_SECRET
 
 # Run Medusa Seeding
 # npx medusa seed -f ./data/seed.json || true
