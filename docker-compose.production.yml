@@ -23,6 +23,10 @@ secrets:
     file: ./secrets/production/meilisearch_master_key
   paypal_client_secret:
     file: ./secrets/production/paypal_client_secret
+  stripe_api_key:
+    file: ./secrets/production/stripe_api_key
+  stripe_webhook_secret:
+    file: ./secrets/production/stripe_webhook_secret
   postgres_pass:
     file: ./secrets/production/postgres_pass
   redis.conf:

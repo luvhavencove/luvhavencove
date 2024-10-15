@@ -28,9 +28,13 @@ services:
       - NODE_ENV=development
       - MEILISEARCH_API_KEY=/run/secrets/meilisearch_master_key
       - PAYPAL_CLIENT_SECRET=/run/secrets/paypal_client_secret
+      - STRIPE_API_KEY=/run/secrets/stripe_api_key
+      - STRIPE_WEBHOOK_SECRET=/run/secrets/stripe_webhook_secret
     secrets:
       - meilisearch_master_key
       - paypal_client_secret
+      - stripe_api_key
+      - stripe_webhook_secret
     healthcheck:
       test: >
         curl --fail http://localhost:9000/health || exit 1
@@ -159,6 +163,10 @@ secrets:
     file: ./secrets/meilisearch_master_key
   paypal_client_secret:
     file: ./secrets/paypal_client_secret
+  stripe_api_key:
+    file: ./secrets/stripe_api_key
+  stripe_webhook_secret:
+    file: ./secrets/stripe_webhook_secret
   postgres_pass:
     file: ./secrets/postgres_pass
   redis.conf:
